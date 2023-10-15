@@ -277,7 +277,15 @@ def partition_students():
 
 def remove_student():
     # Implement the functionality to remove a student by ID
-    pass
+    student_id = input("Remove by ID:").strip()
+    students = Database.read_objects()
+    for student in students:
+        if student.id ==student_id:
+            students.remove(student)
+            print(f"Removing Student {student_id} Account")
+            save_students_to_file(students)
+        else:
+            print(f"Student {student_id} does not exist")
 
 def show_students():
     # Implement the functionality to show the list of students
