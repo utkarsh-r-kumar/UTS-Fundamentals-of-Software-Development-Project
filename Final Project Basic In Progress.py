@@ -41,7 +41,16 @@ class Student:
         return total_mark / len(self.subjects)
 
     def is_passing(self):
-        return self.calculate_average_mark() >= 50
+        # check if they pass individual subject. If they are fail in one subject they should be markerd as fail
+        for subject in self.subjects:
+            if subject.mark < 50:
+                return False
+        #sometime student might be registered but, they might not have been enrolled so we need to check overall marks as well
+        if(self.calculate_average_mark() >= 50):
+            return True
+        else: 
+            return False
+
 
 class Utils:
     EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
