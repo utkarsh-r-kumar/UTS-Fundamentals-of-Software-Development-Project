@@ -281,7 +281,7 @@ def clear_database_file():
         print("Invalid choice. Please enter 'Y' for Yes or 'N' for No.")
 
 def group_students():
-    students = Database.read_objects()  # Assuming Database provides a method to read student data
+    students = Database.read_objects()  
     print("Grade Grouping")
     if not students:
         print("< Nothing to Display >")
@@ -290,7 +290,7 @@ def group_students():
 
         for student in students:
             if student.subjects:
-                grade = student.calculate_grade()  # Assuming Student has a method for calculating grades
+                grade = student.calculate_grade() 
                 grouped_students[grade].append(student)
 
         for grade, students in grouped_students.items():
