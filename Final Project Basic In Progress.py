@@ -54,16 +54,16 @@ class Subject:
         self.calculate_grade()
 
     def calculate_grade(self):
-        if 90 <= self.mark <= 100:
-            self.grade = 'A'
-        elif 80 <= self.mark < 90:
-            self.grade = 'B'
-        elif 70 <= self.mark < 80:
-            self.grade = 'C'
-        elif 60 <= self.mark < 70:
+        if 85 <= self.mark <= 100:
+            self.grade = 'HD'
+        elif 75 <= self.mark < 85:
             self.grade = 'D'
+        elif 65 <= self.mark < 75:
+            self.grade = 'C'
+        elif 50 <= self.mark < 65:
+            self.grade = 'P'
         else:
-            self.grade = 'F'
+            self.grade = 'Z'
 
 class Database:
     @staticmethod
@@ -269,46 +269,77 @@ def student_login():
             print("Invalid choice. Please try again.")
 
 def clear_database_file():
-    # Implement the functionality to clear the database file
-    print("\nClearing students database")
-    choice=input("Are you sure you want to clear the database (Y)ES/(N)O: ").strip().upper()
-    if choice=='Y':
-        if Database.file_exists():
-            Database.create_file()
-            print("Database cleared successfully")
-        else:
-            print("Database does not exist!")
-    elif choice=='N':
-        admin_menu()
+    print("Clearing students database")
+    choice = input("Are you sure you want to clear the database (Y)ES/(N)O: ").strip().upper()
+    
+    if choice == 'Y':
+        Database.clear_objects()
+        print("Students data cleared")
+    elif choice == 'N':
+        pass
     else:
-        print("Invalid choice. Please try again.")
+        print("Invalid choice. Please enter 'Y' for Yes or 'N' for No.")
 
 def group_students():
-    # Implement the functionality to group students by grade
-    pass
+    students = Database.read_objects()  # Assuming Database provides a method to read student data
+    print("Grade Grouping")
+    if not students:
+        print("< Nothing to Display >")
+    else:
+        grouped_students = defaultdict(list)
+
+        for student in students:
+            if student.subjects:
+                grade = student.calculate_grade()  # Assuming Student has a method for calculating grades
+                grouped_students[grade].append(student)
+
+        for grade, students in grouped_students.items():
+            print(f"{grade} --> {[student.name + ' :: ' + student.id + ' --> GRADE: ' + student.calculate_grade() + ' - MARK: ' + str(student.calculate_average_mark()) for student in students]}")
+
+
 
 def partition_students():
-    # Implement the functionality to partition students by pass/fail
-    pass
+    students = Database.read_objects()  
+
+    passing_students = []
+    failing_students = []
+
+    for student in students:
+        if student.is_passing():
+            passing_students.append(student)
+        else:
+            failing_students.append(student)
+
+    print("PASS/FAIL Partition")
+    print(f"FAIL --> {[student.name + ' :: ' + student.id + ' --> GRADE: ' + student.calculate_grade() + ' - MARK: ' + str(student.calculate_average_mark()) for student in failing_students]}")
+    print(f"PASS --> {[student.name + ' :: ' + student.id + ' --> GRADE: ' + student.calculate_grade() + ' - MARK: ' + str(student.calculate_average_mark()) for student in passing_students]}")
+
 
 def remove_student():
+    #Binaya
     # Implement the functionality to remove a student by ID
-    student_id = input("Remove by ID:").strip()
+    student_id = input("Enter the ID of the student to remove: ").strip()
     students = Database.read_objects()
+
     for student in students:
-        if student.id ==student_id:
+        if student.id == student_id:
             students.remove(student)
-            print(f"Removing Student {student_id} Account")
-            save_students_to_file(students)
-        else:
-            print(f"Student {student_id} does not exist")
+            Database.write_objects(students)
+            print(f"Student with ID {student_id} removed successfully.")
+            return
+
+    print(f"No student found with ID {student_id}.")
+    
 
 def show_students():
-    # Implement the functionality to show the list of students
-    students = Database.read_objects()
+    students = Database.read_objects()  
     print("Student List")
-    for student in students:
-        print(f"{student.name} :: {student.id} --> Email:{student.email}")
+    if not students:
+        print("< Nothing to Display >")
+    else:
+        for student in students:
+            print(f"{student.name} :: {student.id} --> Email: {student.email}")
+
 
 if __name__ == "__main__":
     if not Database.file_exists():
