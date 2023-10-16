@@ -23,8 +23,16 @@ class Student:
         else:
             print("You are not enrolled in this subject.")
 
-    def change_password(self, new_password):
-        self.password = new_password
+    def change_password():
+            students = Database.read_objects()
+            for student in students:
+                new_password = input("Enter a new password: ").strip()
+                if not re.match(Utils.PASSWORD_REGEX, new_password):
+                    print("Incorrect password format. Please try again.")
+                else:
+                    student.password=new_password
+                    print("Password changed successfully.")
+                    save_students_to_file(students)  # Save students to the file after changing password
 
     def calculate_average_mark(self):
         if not self.subjects:
@@ -139,10 +147,7 @@ def student_actions(student, students):
         choice = input("Enter your choice: ").strip().upper()
 
         if choice == 'C':
-            new_password = input("Enter a new password: ").strip()
-            student.change_password(new_password)
-            print("Password changed successfully.")
-            save_students_to_file(students)  # Save students to the file after changing password
+            Student.change_password()
         elif choice == 'E':
             if len(student.subjects) >= 4:
                 print("You have already enrolled in the maximum number of subjects (4).")
@@ -265,7 +270,18 @@ def student_login():
 
 def clear_database_file():
     # Implement the functionality to clear the database file
-    pass
+    print("\nClearing students database")
+    choice=input("Are you sure you want to clear the database (Y)ES/(N)O: ").strip().upper()
+    if choice=='Y':
+        if Database.file_exists():
+            Database.create_file()
+            print("Database cleared successfully")
+        else:
+            print("Database does not exist!")
+    elif choice=='N':
+        admin_menu()
+    else:
+        print("Invalid choice. Please try again.")
 
 def group_students():
     # Implement the functionality to group students by grade
@@ -289,7 +305,10 @@ def remove_student():
 
 def show_students():
     # Implement the functionality to show the list of students
-    pass
+    students = Database.read_objects()
+    print("Student List")
+    for student in students:
+        print(f"{student.name} :: {student.id} --> Email:{student.email}")
 
 if __name__ == "__main__":
     if not Database.file_exists():
