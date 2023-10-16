@@ -1,8 +1,7 @@
 import os
 import random
-import pickle  # For object serialization
+import pickle
 import re 
-from collections import defaultdict
 
 class Student:
     def __init__(self, name, email, password):
@@ -11,44 +10,41 @@ class Student:
         self.email = email
         self.password = password
         self.subjects = []
+        self.overall_mark = 0  # Initialize overall mark to 0
 
     def enroll_subject(self, subject):
         if len(self.subjects) < 4:
             self.subjects.append(subject)
+            self.calculate_overall_mark()  # Calculate overall mark
         else:
             print("You have already enrolled in the maximum number of subjects (4).")
-
-    def drop_subject(self, subject):
-        if subject in self.subjects:
-            self.subjects.remove(subject)
-        else:
-            print("You are not enrolled in this subject.")
 
     def change_password(self, new_password):
         self.password = new_password
 
-    def calculate_average_mark(self):
+    def drop_subject(self, subject_id):
+        subject_to_remove = None
+        for subject in self.subjects:
+            if subject.id == subject_id:
+                subject_to_remove = subject
+                break
+
+        if subject_to_remove:
+            self.subjects.remove(subject_to_remove)
+            self.calculate_overall_mark()  # Calculate overall mark
+            print(f"Subject-{subject_id} removed.")
+        else:
+            print(f"Not enrolled in Subject-{subject_id}")
+
+    def calculate_overall_mark(self):
         if not self.subjects:
-            return 0  # No subjects enrolled
-        total_mark = sum(subject.mark for subject in self.subjects)
-        return total_mark / len(self.subjects)
+            self.overall_mark = 0
+        else:
+            total_mark = sum(subject.mark for subject in self.subjects)
+            self.overall_mark = total_mark / len(self.subjects)
 
     def is_passing(self):
-        return self.calculate_average_mark() >= 50
-    
-    def calculate_grade(self):
-        mark = self.calculate_average_mark()
-        if 90 <= mark <= 100:
-            return 'A'
-        elif 80 <= mark < 90:
-            return 'B'
-        elif 70 <= mark < 80:
-            return 'C'
-        elif 60 <= mark < 70:
-            return 'D'
-        else:
-            return 'F'
-   
+        return self.overall_mark >= 50
 
 class Utils:
     EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
@@ -61,14 +57,10 @@ class Subject:
         self.calculate_grade()
 
     def calculate_grade(self):
-        if 90 <= self.mark <= 100:
-            self.grade = 'A'
-        elif 80 <= self.mark < 90:
-            self.grade = 'B'
-        elif 70 <= self.mark < 80:
-            self.grade = 'C'
-        elif 60 <= self.mark < 70:
-            self.grade = 'D'
+        if self.mark >= 80:
+            self.grade = 'HD'
+        elif self.mark >= 50:
+            self.grade = 'P'
         else:
             self.grade = 'F'
 
@@ -104,7 +96,7 @@ def save_students_to_file(students):
 
 def main_menu():
     while True:
-        print("University System: (A)dmin, (S)tudent, or X:")
+        print("University System: (A)dmin, (S)tudent, or Exit(X):")
         choice = input("Enter your choice: ").strip().upper()
 
         if choice == 'A':
@@ -122,9 +114,9 @@ def student_menu():
         choice = input("Enter your choice: ").strip().upper()
 
         if choice == 'L':
-            student,students = student_login()
+            student = student_login()
             if student:
-                student_actions(student, students)
+                student_actions(student)
         elif choice == 'R':
             student_register()
         elif choice == 'X':
@@ -143,53 +135,43 @@ def student_login():
     for student in students:
         if student.email == email and student.password == password:
             print("Login successful.")
-            return student,students
+            return student
 
     print("Invalid credentials. Please try again.")
-    return None,students
+    return None
 
-def student_actions(student, students):
+def student_actions(student):
     while True:
         print("\nStudent Course Menu (C)hange, (E)nrol, (R)emove, (S)how, or (X) Exit:")
         choice = input("Enter your choice: ").strip().upper()
 
         if choice == 'C':
-           while True:
             new_password = input("Enter a new password: ").strip()
-            if re.match(Utils.PASSWORD_REGEX, new_password):
-                print("Password is valid. Changing password...")
-                break
-            else:
-                print("Invalid password format. Please try again.")
-            save_students_to_file(students)  # Save students to the file after changing password
+            student.change_password(new_password)
+            print("Password changed successfully.")
+            save_students_to_file([student])  # Save the updated student to the file after changing password
         elif choice == 'E':
             if len(student.subjects) >= 4:
-                print("You have already enrolled in the maximum number of subjects (4).")
+                print("You are allowed to enroll in a maximum of 4 subjects only.")
             else:
                 subject = Subject()
                 student.enroll_subject(subject)
-                print("Enrolled in a subject.")
-                save_students_to_file(students)  # Save students to the file after enrolling
+                print(f"Enrolled in Subject-{subject.id}")
+                save_students_to_file([student])  # Save the updated student to the file after enrolling
         elif choice == 'R':
             if not student.subjects:
                 print("You are not enrolled in any subjects.")
             else:
-                subject_id = input("Enter the ID of the subject to remove: ").strip()
-                for subject in student.subjects:
-                    if subject.id == subject_id:
-                        student.drop_subject(subject)
-                        print("Subject removed.")
-                        save_students_to_file(students)  # Save students to the file after removing
-                        break
-                else:
-                    print("Subject not found in your enrollment.")
+                subject_id = input("Remove Subject by ID: ").strip()
+                student.drop_subject(subject_id)
+                save_students_to_file([student])  # Save the updated student to the file after removing
         elif choice == 'S':
             if not student.subjects:
                 print("You are not enrolled in any subjects.")
             else:
                 print("Enrolled Subjects:")
                 for subject in student.subjects:
-                    print(f"ID: {subject.id}, Mark: {subject.mark}, Grade: {subject.grade}")
+                    print(f"[Subject::{subject.id} -- mark = {subject.mark} -- grade = {subject.grade}]")
         elif choice == 'X':
             student_menu()
         else:
@@ -249,26 +231,12 @@ def student_register():
     print("Student registered successfully.")
 
 def clear_database_file():
-    Database.create_file()
-    print("Database cleared successfully")
+    # Implement the functionality to clear the database file
+    pass
+
 def group_students():
-    students = Database.read_objects()  # Assuming Database provides a method to read student data
-    grouped_students = defaultdict(list)
-
-    for student in students:
-        if  student.subjects:
-            grade = student.calculate_grade()  # Assuming Student has a method for calculating grades
-            grouped_students[grade].append(student)
-            
-
-    for grade, students in grouped_students.items():
-        print(f"Grade {grade}:")
-        for student in students:
-            print(f"Student ID: {student.id}, Name: {student.name}")
-    if len(grouped_students)==0:
-        print("No suject enrolled or No student register")
-    return grouped_students
-
+    # Implement the functionality to group students by grade
+    pass
 
 def partition_students():
     # Implement the functionality to partition students by pass/fail
@@ -279,40 +247,11 @@ def remove_student():
     pass
 
 def show_students():
-    students = Database.read_objects()  # Assuming Database provides a method to read student data
-
-    if not students:
-        print("No students found in the database.")
-    else:
-        print("List of Students:")
-        for student in students:
-            print(f"Student ID: {student.id}")
-            print(f"Name: {student.name}")
-            print(f"Email: {student.email}")
-            print("Subjects Enrolled:")
-            if student.subjects:
-                for subject in student.subjects:
-                    print(f"Subject ID: {subject.id}, Mark: {subject.mark}, Grade: {subject.grade}")
-                    print("Average Mark:", student.calculate_average_mark())
-                    print("Passing Status:", "Pass" if student.is_passing() else "Fail")
-            else:
-                print("No subjects enrolled.")
-            print("-" * 20)  # Separating each student's information
-
     # Implement the functionality to show the list of students
     pass
+
 
 if __name__ == "__main__":
     if not Database.file_exists():
         Database.create_file()
     main_menu()
-
-# students=Database.read_objects()
-
-# for student in students:
-#     print(f"Student ID: {student.id}")
-#     print(f"Name: {student.name}")
-#     print(f"Email: {student.email}")
-#     print(f"Password: {student.password}")
-#     print(f"Subjects: {student.subjects}")
-#     print()
