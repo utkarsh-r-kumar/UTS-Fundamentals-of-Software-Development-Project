@@ -1,7 +1,7 @@
 import os
 import random
 import pickle
-import re 
+import re
 from collections import defaultdict
 
 class Student:
@@ -43,20 +43,20 @@ class Student:
         else:
             total_mark = sum(subject.mark for subject in self.subjects)
             self.overall_mark = total_mark / len(self.subjects)
+
     def is_passing(self):
-        # check if they pass individual subject. If they are fail in one subject they should be markerd as fail
+        # Check if they pass individual subjects; if they fail in one subject, they should be marked as fail
         for subject in self.subjects:
             if subject.mark < 50:
                 return False
-        #sometime student might be registered but, they might not have been enrolled so we need to check overall marks as well
-        if(self.overall_mark >= 50):
-            return True
-        else: 
+        # If they have no subjects, they are also marked as fail
+        if not self.subjects:
             return False
-
+        # If they pass all subjects and have at least one subject, they are marked as pass
+        return True
 
 class Utils:
-    EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zAZ0-9-.]+$'
     PASSWORD_REGEX = r'^[A-Z][a-zA-Z0-9]{5,}[0-9]{3,}$'
 
 class Subject:
@@ -235,10 +235,10 @@ def student_register():
         name = input("Name: ").strip()
         print(f"Enrolling Student {name}")
 
-        # Create a new student and save it to students.data
+        # Create a new student and append it to the list of existing students
         student = Student(name, email, password)
         students.append(student)
-        save_students_to_file(students)  # Save students to the file
+        save_students_to_file(students)  # Save the updated list of students to the file
         break
 
     print("Student registered successfully.")
@@ -265,13 +265,11 @@ def group_students():
 
         for student in students:
             if student.subjects:
-                grade = student.calculate_grade()  # Assuming Student has a method for calculating grades
+                grade = student.subjects[0].grade  # Assuming Student has at least one subject to determine the grade
                 grouped_students[grade].append(student)
 
         for grade, students in grouped_students.items():
-            print(f"{grade} --> {[student.name + ' :: ' + student.id + ' --> GRADE: ' + student.calculate_grade() + ' - MARK: ' + str(student.calculate_average_mark()) for student in students]}")
-
-
+            print(f"{grade} --> {[student.name + ' :: ' + student.id + ' --> GRADE: ' + student.subjects[0].grade + ' - MARK: ' + str(student.overall_mark) for student in students]}")
 
 def partition_students():
     students = Database.read_objects()  
@@ -286,13 +284,10 @@ def partition_students():
             failing_students.append(student)
 
     print("PASS/FAIL Partition")
-    print(f"FAIL --> {[student.name + ' :: ' + student.id + ' --> GRADE: ' + student.calculate_grade() + ' - MARK: ' + str(student.calculate_average_mark()) for student in failing_students]}")
-    print(f"PASS --> {[student.name + ' :: ' + student.id + ' --> GRADE: ' + student.calculate_grade() + ' - MARK: ' + str(student.calculate_average_mark()) for student in passing_students]}")
-
+    print(f"FAIL --> {[student.name + ' :: ' + student.id + ' --> GRADE: ' + student.subjects[0].grade + ' - MARK: ' + str(student.overall_mark) for student in failing_students]}")
+    print(f"PASS --> {[student.name + ' :: ' + student.id + ' --> GRADE: ' + student.subjects[0].grade + ' - MARK: ' + str(student.overall_mark) for student in passing_students]}")
 
 def remove_student():
-    #Binaya
-    # Implement the functionality to remove a student by ID
     student_id = input("Enter the ID of the student to remove: ").strip()
     students = Database.read_objects()
 
@@ -304,7 +299,6 @@ def remove_student():
             return
 
     print(f"No student found with ID {student_id}.")
-    
 
 def show_students():
     students = Database.read_objects()  
@@ -314,7 +308,6 @@ def show_students():
     else:
         for student in students:
             print(f"{student.name} :: {student.id} --> Email: {student.email}")
-
 
 if __name__ == "__main__":
     if not Database.file_exists():
