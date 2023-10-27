@@ -4,6 +4,7 @@ import os
 import random
 import pickle
 import re
+from collections import defaultdict
 
 class Subject:
     def __init__(self, name, mark):
