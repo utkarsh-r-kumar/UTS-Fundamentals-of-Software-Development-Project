@@ -4,13 +4,11 @@ import os
 import random
 import pickle
 import re
-from collections import defaultdict
 
 class Subject:
-    def __init__(self, name, mark):
+    def __init__(self, name, mark=0):
         self.name = name
         self.mark = mark
-
 
 class Student:
     def __init__(self, name, email, password):
@@ -49,11 +47,9 @@ class Student:
         else:
             return False
 
-
 class Utils:
-    EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zAZ0-9-.]+$'
+    EMAIL_REGEX = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     PASSWORD_REGEX = r'^[A-Z][a-zA-Z0-9]{5,}[0-9]{3,}$'
-
 
 class Database:
     @staticmethod
@@ -80,11 +76,6 @@ class Database:
     @staticmethod
     def save_students_to_file(students):
         Database.write_objects(students, "students.data")
-
-    @staticmethod
-    def save_subjects_to_file(subjects):
-        Database.write_objects(subjects, "students.data")  # Use the same file as CLI for subjects
-
 
 class StudentSystemApp:
     def __init__(self, root):
@@ -218,8 +209,8 @@ class StudentSystemApp:
             subject_id = f"Subject-{str(random.randint(0, 999)).zfill(3)}"
 
             # Enroll the student in the randomly generated subject
-            self.current_student.enroll_subject(Subject(subject_id, 0))  # Assigning a mark of 0, but we won't use it
-
+            self.current_student.enroll_subject(Subject(subject_id))
+            
             # Show a message to indicate the enrollment
             messagebox.showinfo("Enrollment", f"Enrolled in {subject_id}.")
 
@@ -317,10 +308,6 @@ class StudentSystemApp:
         self.students.append(student)
         self.save_students()  # Save students to the file
         messagebox.showinfo("Success", f"Enrolling Student {name}")
-
-    def clear_screen(self):
-        for widget in self.root.winfo_children():
-            widget.destroy()
 
 if __name__ == "__main__":
     root = tk.Tk()
