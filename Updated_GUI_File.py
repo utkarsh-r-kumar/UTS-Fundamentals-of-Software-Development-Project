@@ -121,24 +121,45 @@ class StudentSystemApp:
     def main_menu(self):
         self.clear_screen()
         self.root.title("University System")
-        self.root.geometry("300x200")
+        self.root.geometry("1200x800")
         self.root.configure(bg='#607b8d')
         self.root.resizable(False, False)
 
-        student_button = tk.Button(self.root, text="Student", command=self.student_menu)
-        student_button.pack()
+         # Add a label at the top with the specified text and formatting
+        title_label = tk.Label(self.root, text="By\nUtkarsh Kumar (25027780)\nYixuan Zhang (14372318)\nBinaya Raj Bista (14194157)\nMacdom Ugochukwu (24694402)",
+                            bg='#607b8d', font=("Helvetica", 14, "bold"), justify='center')
+        title_label.pack(expand=True, fill='both')  # To center-align the label
+
+        # Center-align the buttons and make them expand but not fill the whole screen
+        button_width = 20  # Double the width
+        button_height = 2  # Double the height
+
+        student_button = tk.Button(self.root, text="Start", command=self.student_menu)
+        student_button.pack(expand=True, fill='none', pady=10)
+    
         exit_button = tk.Button(self.root, text="Exit", command=self.root.quit)
-        exit_button.pack()
+        exit_button.pack(expand=True, fill='none', pady=50)
 
     def student_menu(self):
         self.clear_screen()
         self.root.title("Student System")
+        self.root.geometry("1200x800")  # Adjusted size
+        self.root.configure(bg='#607b8d')
+        self.root.resizable(False, False)
+
+        # Center-align the buttons and make them expand but not fill the whole screen
+        button_width = 20  # Double the width
+        button_height = 20  # Double the height
+
+        # Center-align the buttons and make them expand but not fill the whole screen
         login_button = tk.Button(self.root, text="Login", command=self.student_login)
-        login_button.pack()
+        login_button.pack(expand=True, fill='none', pady=10)
+        
         register_button = tk.Button(self.root, text="Register", command=self.student_register)
-        register_button.pack()
+        register_button.pack(expand=True, fill='none', pady=10)
+
         exit_button = tk.Button(self.root, text="Exit", command=self.main_menu)
-        exit_button.pack()
+        exit_button.pack(expand=True, fill='none', pady=10)
 
     def student_login(self):
         self.clear_screen()
