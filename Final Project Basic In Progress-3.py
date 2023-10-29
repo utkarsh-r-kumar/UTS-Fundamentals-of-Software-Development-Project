@@ -26,7 +26,7 @@ class Student:
     def drop_subject(self, subject_id):
         subject_to_remove = None
         for subject in self.subjects:
-            if subject.id == subject_id:
+            if subject.id == f"Subject-{subject_id}":
                 subject_to_remove = subject
                 break
 
