@@ -8,10 +8,10 @@ from collections import defaultdict
 import base64
 
 class Subject:
-    def __init__(self, id, mark, grade):
-        self.id = id
-        self.mark = mark
-        self.grade = grade
+    def __init__(self, subject_id, mark):
+        self.id = f"Subject-{str(random.randint(1, 999)).zfill(3)}"
+        self.mark = random.randint(25, 100)
+        self.calculate_grade()
 
     def calculate_grade(self):
         if 85 <= self.mark <= 100:
@@ -24,8 +24,6 @@ class Subject:
             self.grade = 'P'
         else:
             self.grade = 'Z'
-
-
 
 class Student:
     def __init__(self, name, email, password):
@@ -183,10 +181,10 @@ class StudentSystemApp:
         password_entry.pack()
 
         login_button = tk.Button(self.root, text="Login", command=lambda: self.login_action(email_entry.get(), password_entry.get()))
-        login_button.pack(side="right")
+        login_button.pack(side="top", pady=10)
 
         back_button = tk.Button(self.root, text="Back", command=self.student_menu)
-        back_button.pack(side="right")
+        back_button.pack(side="bottom", pady=10)
 
     def login_action(self, email, password):
         # Check if the email and password exist in students.data
@@ -207,34 +205,38 @@ class StudentSystemApp:
         self.clear_screen()
         course_menu_label = tk.Label(self.root, text="Student Course Menu", bg='#e6e9eb')
         course_menu_label.pack()
+
+        # Center-align the buttons vertically
         change_password_button = tk.Button(self.root, text="Change Password", command=lambda: self.change_password(student))
-        change_password_button.pack()
+        change_password_button.pack(side="top", pady=10)  # Use side="top" and add padding
 
         enroll_button = tk.Button(self.root, text="Enroll in Subject", command=self.enroll_subject)
-        enroll_button.pack()
+        enroll_button.pack(side="top", pady=10)  # Use side="top" and add padding
 
         remove_button = tk.Button(self.root, text="Remove Subject", command=self.remove_subject)
-        remove_button.pack()
+        remove_button.pack(side="top", pady=10)  # Use side="top" and add padding
 
         show_button = tk.Button(self.root, text="Show Enrolled Subjects", command=self.show_subjects)
-        show_button.pack()
+        show_button.pack(side="top", pady=10)  # Use side="top" and add padding
 
         back_button = tk.Button(self.root, text="Back", command=self.student_login)
-        back_button.pack()
+        back_button.pack(side="bottom", pady=10)  # Use side="bottom" and add padding
 
     def change_password(self, student):
         self.clear_screen()
         change_password_label = tk.Label(self.root, text="Change Password", bg='#e6e9eb')
         change_password_label.pack()
+
         new_password_label = tk.Label(self.root, text="Enter a new password:", bg='#e6e9eb')
         new_password_label.pack()
         new_password_entry = tk.Entry(self.root, show="*")  # To hide the password characters
         new_password_entry.pack()
-        change_password_button = tk.Button(self.root, text="Change Password",
-                                          command=lambda: self.update_password(new_password_entry.get()))
-        change_password_button.pack(side="right")
+
+        change_password_button = tk.Button(self.root, text="Change Password", command=lambda: self.update_password(new_password_entry.get()))
+        change_password_button.pack(side="top", pady=10)  # Place at the top with padding
+
         back_button = tk.Button(self.root, text="Back", command=lambda: self.student_actions(student))
-        back_button.pack(side="right")
+        back_button.pack(side="bottom", pady=10)  # Place at the bottom with padding
 
     def update_password(self, new_password):
         # Validate the new password and update the student's password
@@ -251,39 +253,31 @@ class StudentSystemApp:
 
     def enroll_subject(self):
         self.clear_screen()
-
         # Check if the student has already enrolled in the maximum number of subjects
         if len(self.current_student.subjects) >= 4:
             messagebox.showerror("Error", "You have already enrolled in the maximum number of subjects (4).")
         else:
             # Generate a random subject ID from Subject-000 to Subject-999
             subject_id = f"Subject-{str(random.randint(0, 999)).zfill(3)}"
-
             # Enroll the student in the randomly generated subject
             self.current_student.enroll_subject(Subject(subject_id, 0))  # Assigning a mark of 0, but we won't use it
-
             # Show a message to indicate the enrollment
             messagebox.showinfo("Enrollment", f"Enrolled in {subject_id}.")
-
         back_button = tk.Button(self.root, text="Back", command=lambda: self.student_actions(self.current_student))
-        back_button.pack(side="right")
+        back_button.pack(expand=True, fill='none', pady=10)  # Place at the bottom with padding
 
     def remove_subject(self):
         self.clear_screen()
         remove_subject_label = tk.Label(self.root, text="Remove Subject", bg='#e6e9eb')
         remove_subject_label.pack()
-
         subject_code_label = tk.Label(self.root, text="Subject Code (e.g., 001):", bg='#e6e9eb')
         subject_code_label.pack()
-
         subject_code_entry = tk.Entry(self.root)
         subject_code_entry.pack()
-
         remove_button = tk.Button(self.root, text="Remove", command=lambda: self.remove_action(subject_code_entry.get()))
-        remove_button.pack(side="right")
-
+        remove_button.pack(expand=True, fill='none', pady=10)  # Place at the top with padding
         back_button = tk.Button(self.root, text="Back", command=lambda: self.student_actions(self.current_student))
-        back_button.pack(side="right")
+        back_button.pack(expand=True, fill='none', pady=10)  # Place at the bottom with padding
 
     def remove_action(self, subject_code):
         # Validate subject removal and remove it from the student's subjects
@@ -292,17 +286,17 @@ class StudentSystemApp:
             return
 
         subject_id = f"Subject-{subject_code}"
-        subject = next((s for s in self.current_student.subjects if s.name == subject_id), None)
+        subject_to_remove = None
 
-        if subject:
-            self.current_student.drop_subject(subject)
-            students = self.students
-            for index, student in enumerate(students):
-                if student.id == self.current_student.id:
-                    students[index] = self.current_student
-                    self.save_students()  # Save students to the file after removing the subject
-                    messagebox.showinfo("Success", f"Removed subject: {subject_id}.")
-                    break
+        for subject in self.current_student.subjects:
+            if subject.id == subject_id:
+                subject_to_remove = subject
+                break
+
+        if subject_to_remove is not None:
+            self.current_student.drop_subject(subject_to_remove)
+            self.save_students()  # Save students to the file after removing the subject
+            messagebox.showinfo("Success", f"Removed subject: {subject_id}.")
         else:
             messagebox.showerror("Error", f"You are not enrolled in subject {subject_id}.")
 
@@ -310,10 +304,12 @@ class StudentSystemApp:
         self.clear_screen()
         show_subjects_label = tk.Label(self.root, text="Enrolled Subjects", bg='#e6e9eb')
         show_subjects_label.pack()
+
         subjects_text = "Enrolled Subjects:\n"
         for subject in self.current_student.subjects:
-            subject_info = f"Subject-{subject.id} -- mark = {subject.mark} -- grade = {subject.grade}"
+            subject_info = f"{subject.id} - Mark: {subject.mark}, Grade: {subject.grade}"
             subjects_text += subject_info + "\n"
+
         subjects_label = tk.Label(self.root, text=subjects_text, bg='#e6e9eb', justify='left')
         subjects_label.pack()
 
