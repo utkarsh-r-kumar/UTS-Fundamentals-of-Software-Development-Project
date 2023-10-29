@@ -61,7 +61,7 @@ class Utils:
 
 class Subject:
     def __init__(self):
-        self.id = str(random.randint(1, 999)).zfill(3)  # 3-digit unique ID
+        self.id = f"Subject-{str(random.randint(1, 999)).zfill(3)}"
         self.mark = random.randint(25, 100)
         self.calculate_grade()
 
@@ -155,7 +155,7 @@ def student_login():
 
 def student_actions(student):
     while True:
-        print("\nStudent Course Menu (C)hange, (E)nrol, (R)emove, (S)how, or (X) Exit:")
+        print("\nStudent Course Menu (C)hange, (E)nroll, (R)emove, (S)how, or (X) Exit:")
         choice = input("Enter your choice: ").strip().upper()
 
         if choice == 'C':
@@ -169,7 +169,12 @@ def student_actions(student):
             else:
                 subject = Subject()
                 student.enroll_subject(subject)
-                print(f"Enrolled in Subject-{subject.id}")
+                subject_info = f"mark = {subject.mark}"
+                if hasattr(subject, 'grade'):
+                    subject_info += f" -- grade = {subject.grade}"
+                if hasattr(subject, 'id'):
+                    subject_info = f"Subject-{subject.id} -- {subject_info}"
+                print(f"Enrolled in {subject_info}")
                 save_students_to_file([student])  # Save the updated student to the file after enrolling
         elif choice == 'R':
             if not student.subjects:
@@ -183,8 +188,13 @@ def student_actions(student):
                 print("You are not enrolled in any subjects.")
             else:
                 print("Enrolled Subjects:")
-                for subject in student.subjects:
-                    print(f"[Subject::{subject.id} -- mark = {subject.mark} -- grade = {subject.grade}]")
+                for i, subject in enumerate(student.subjects, start=1):
+                    subject_info = f"mark = {subject.mark}"
+                    if hasattr(subject, 'grade'):
+                        subject_info += f" -- grade = {subject.grade}"
+                    if hasattr(subject, 'id'):
+                        subject_info = f"Subject-{subject.id} -- {subject_info}"
+                    print(f"{subject_info}")
         elif choice == 'X':
             student_menu()
         else:
