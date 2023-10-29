@@ -152,38 +152,49 @@ class StudentSystemApp:
         self.root.configure(bg='#e6e9eb')
         self.root.resizable(False, False)
 
-        # Center-align the buttons and make them expand but not fill the whole screen
-        button_width = 20  # Double the width
-        button_height = 20  # Double the height
-
-        # Center-align the buttons and make them expand but not fill the whole screen
-        login_button = tk.Button(self.root, text="Login", command=self.student_login)
-        login_button.pack(expand=True, fill='none', pady=10)
         
-        register_button = tk.Button(self.root, text="Register", command=self.student_register)
-        register_button.pack(expand=True, fill='none', pady=10)
+        
+        button_frame = tk.Frame(self.root)
+        button_frame.pack(expand=True)
+        menu_label = tk.Label(button_frame, text="Student Menu \n Select Options") 
+        menu_label.pack(pady=10)
 
-        exit_button = tk.Button(self.root, text="Exit", command=self.main_menu)
-        exit_button.pack(expand=True, fill='none', pady=10)
+ 
+        button_width = 10  
+        button_height = 2 
+
+
+        login_button = tk.Button(button_frame, text="Login", command=self.student_login, width=button_width, height=button_height)
+        login_button.pack(side='left', padx=5, pady=10)
+        
+        register_button = tk.Button(button_frame, text="Register", command=self.student_register, width=button_width, height=button_height)
+        register_button.pack(side='left', padx=5, pady=10)
+
+        exit_button = tk.Button(button_frame, text="Back", command=self.main_menu, width=button_width, height=button_height)
+        exit_button.pack(side='left', padx=5, pady=10)
 
     def student_login(self):
         self.clear_screen()
-        student_login_label = tk.Label(self.root, text="Student Login", bg='#e6e9eb')
+        login_frame = tk.Frame(self.root)
+        login_frame.pack(expand=True)
+     
+        student_login_label = tk.Label(login_frame, text="Student Login", bg='#e6e9eb')
         student_login_label.pack()
-        email_label = tk.Label(self.root, text="Email:", bg='#e6e9eb')
+        
+        email_label = tk.Label(login_frame, text="Email:", bg='#e6e9eb')
         email_label.pack()
-        email_entry = tk.Entry(self.root)
+        email_entry = tk.Entry(login_frame)
         email_entry.pack()
 
-        password_label = tk.Label(self.root, text="Password:", bg='#e6e9eb')
+        password_label = tk.Label(login_frame, text="Password:", bg='#e6e9eb')
         password_label.pack()
-        password_entry = tk.Entry(self.root, show="*")  # To hide the password characters
+        password_entry = tk.Entry(login_frame, show="*")  # To hide the password characters
         password_entry.pack()
 
-        login_button = tk.Button(self.root, text="Login", command=lambda: self.login_action(email_entry.get(), password_entry.get()))
+        login_button = tk.Button(login_frame, text="Login", command=lambda: self.login_action(email_entry.get(), password_entry.get()))
         login_button.pack(side="top", pady=10)
 
-        back_button = tk.Button(self.root, text="Back", command=self.student_menu)
+        back_button = tk.Button(login_frame, text="Back", command=self.student_menu)
         back_button.pack(side="bottom", pady=10)
 
     def login_action(self, email, password):
@@ -318,28 +329,30 @@ class StudentSystemApp:
 
     def student_register(self):
         self.clear_screen()
-        student_register_label = tk.Label(self.root, text="Student Register", bg='#e6e9eb')
+        login_frame = tk.Frame(self.root)
+        login_frame.pack(expand=True)
+        student_register_label = tk.Label(login_frame, text="Student Register", bg='#e6e9eb')
         student_register_label.pack()
-        email_label = tk.Label(self.root, text="Email:", bg='#e6e9eb')
+        email_label = tk.Label(login_frame, text="Email:", bg='#e6e9eb')
         email_label.pack()
-        email_entry = tk.Entry(self.root)
+        email_entry = tk.Entry(login_frame)
         email_entry.pack()
 
-        password_label = tk.Label(self.root, text="Password:", bg='#e6e9eb')
+        password_label = tk.Label(login_frame, text="Password:", bg='#e6e9eb')
         password_label.pack()
-        password_entry = tk.Entry(self.root, show="*")  # To hide the password characters
+        password_entry = tk.Entry(login_frame, show="*")  # To hide the password characters
         password_entry.pack()
 
-        name_label = tk.Label(self.root, text="Name:", bg='#e6e9eb')
+        name_label = tk.Label(login_frame, text="Name:", bg='#e6e9eb')
         name_label.pack()
-        name_entry = tk.Entry(self.root)
+        name_entry = tk.Entry(login_frame)
         name_entry.pack()
 
-        register_button = tk.Button(self.root, text="Register",
+        register_button = tk.Button(login_frame, text="Register",
                                     command=lambda: self.register_action(email_entry.get(), password_entry.get(), name_entry.get()))
         register_button.pack(side="right")
 
-        back_button = tk.Button(self.root, text="Back", command=self.student_menu)
+        back_button = tk.Button(login_frame, text="Back", command=self.student_menu)
         back_button.pack(side="right")
 
     def register_action(self, email, password, name):
